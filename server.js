@@ -26,7 +26,7 @@ const corsOptions = {
     }
     
     // In production, specify allowed origins
-    const allowedOrigins = ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174'];
+    const allowedOrigins = ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174','https://euit-ms-250701-frontend.vercel.app'];
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
