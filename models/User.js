@@ -23,6 +23,10 @@ const userSchema = new mongoose.Schema({
       'Please provide a valid email'
     ]
   },
+  limitPoint:{
+    type:Number,
+    default:5
+  },
   password: {
     type: String,
     required: [true, 'Please provide a password'],

@@ -1,4 +1,5 @@
 const Task = require("../models/Task.js");
+const User = require("../models/User.js");
 
 /**
  * @desc    Get all tasks for logged in user
@@ -95,7 +96,13 @@ const getTask = async (req, res) => {
 const createTask = async (req, res) => {
   try {
     const { title, description, status, priority, dueDate } = req.body;
-
+ const user = await User.findById(req.user._id);
+    if (user.limitPoint === 0) {
+      return res.status(403).json({
+        success: false,
+        message: "You have no points left to create a task.",
+      });
+    }
     // Create task with user ID
     const task = await Task.create({
       title,
@@ -105,6 +112,21 @@ const createTask = async (req, res) => {
       dueDate,
       user: req.user._id,
     });
+
+   
+
+    if (!user) {
+      console.log('User not found');
+      return res.status(401).json({ message: "User not found" });
+    }
+
+
+    await User.updateOne({ _id: req.user._id },
+      {
+        $inc: {
+          limitPoint: -1
+        }
+      })
 
     res.status(201).json({
       success: true,
@@ -120,6 +142,7 @@ const createTask = async (req, res) => {
     });
   }
 };
+
 
 /**
  * @desc    Update task
@@ -182,6 +205,7 @@ const deleteTask = async (req, res) => {
       });
     }
 
+
     // Check if task belongs to logged in user
     if (task.user.toString() !== req.user._id.toString()) {
       return res.status(403).json({
@@ -189,6 +213,13 @@ const deleteTask = async (req, res) => {
         message: "Not authorized to delete this task",
       });
     }
+
+    await User.updateOne({ _id: req.user._id },
+      {
+        $inc: {
+          limitPoint: 1
+        }
+      })
 
     await Task.findByIdAndDelete(req.params.id);
 
